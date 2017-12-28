@@ -1,0 +1,21 @@
+{
+  "name": "MirKml/EoPhpTools",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Miroslav Kubelík",
+      "email": "koubel@seznam.cz"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "MirKml\\EO\\": "src/"
+    }
+  },
+  "require-dev": {
+    "tracy/tracy": "^2.4"
+  },
+  "require": {
+    "dibi/dibi": "^3.1"
+  }
+}
