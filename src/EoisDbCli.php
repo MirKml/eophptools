@@ -53,31 +53,39 @@ class EoisDbCli
         if (!isset($options["e"])) {
             $this->environment = EoisConfig::DEVELOPMENT_ENVIRONMENT;
         } else {
-            switch ($options["e"]) {
-                case "devel":
-                    $this->environment = EoisConfig::DEVELOPMENT_ENVIRONMENT;
-                    break;
-                case "staging":
-                    $this->environment = EoisConfig::STAGING_ENVIRONMENT;
-                    break;
-                case "staging-vpn":
-                    $this->environment = EoisConfig::STAGING_ENVIRONMENT;
-                    $this->isThroughVpn = true;
-                    break;
-                case "production":
-                    $this->environment = EoisConfig::PRODUCTION_ENVIRONMENT;
-                    break;
-                case "production-vpn":
-                    $this->environment = EoisConfig::PRODUCTION_ENVIRONMENT;
-                    $this->isThroughVpn = true;
-                    break;
-                default:
-                    $this->errors[] .= "unknown environment '{$options["e"]}, must be 'devel', 'staging', 'staging-vpn'"
-                        . ", 'production' or 'production-vpn'";
-                    return;
+            $environmentOptions = self::getEnvironmentOption($options["e"]);
+            if (!isset($environmentOptions["environment"])) {
+                $this->errors[] .= "unknown environment '{$options["e"]}, must be 'devel', 'staging', 'staging-vpn'"
+                    . ", 'production' or 'production-vpn'";
             }
+            $this->environment = $environmentOptions["environment"];
+            $this->isThroughVpn = $environmentOptions["isThroughVpn"];
         }
+    }
 
+    final public static function getEnvironmentOption($environment)
+    {
+        $options = ["isThroughVpn" => false];
+        switch ($environment) {
+            case "devel":
+                $options["environment"] = EoisConfig::DEVELOPMENT_ENVIRONMENT;
+                break;
+            case "staging":
+                $options["environment"] = EoisConfig::STAGING_ENVIRONMENT;
+                break;
+            case "staging-vpn":
+                $options["environment"] = EoisConfig::STAGING_ENVIRONMENT;
+                $options["isThroughVpn"] = true;
+                break;
+            case "production":
+                $options["environment"] = EoisConfig::PRODUCTION_ENVIRONMENT;
+                break;
+            case "production-vpn":
+                $options["environment"] = EoisConfig::PRODUCTION_ENVIRONMENT;
+                $options["isThroughVpn"] = true;
+                break;
+        }
+        return $options;
     }
 
     public function execute()
