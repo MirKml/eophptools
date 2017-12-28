@@ -85,6 +85,19 @@ class HttpApi
         return $this->executeCurl($process);
     }
 
+    public function postJson($actionUrl, $data, $parameters = [])
+    {
+        $this->resetResultVariables();
+        $process = $this->createCurlProcess($actionUrl, $parameters);
+        curl_setopt($process, CURLOPT_HTTPHEADER, [
+            "Accept: application/json",
+            "Content-Type: application/json; charset=utf-8"
+        ]);
+        $this->requestBody = json_encode($data);
+        curl_setopt($process, CURLOPT_POSTFIELDS, $this->requestBody);
+        return $this->executeCurl($process);
+    }
+
     private function createCurlProcess($actionUrl, array $parameters)
     {
         $requestUrl = $this->baseUrl . "/" . $actionUrl;
@@ -141,9 +154,14 @@ class HttpApi
         $this->printResponse($this->getJson($actionUrl, $parameters));
     }
 
-    public function printPostJson($actionUrl, $filePath, $parameters = [])
+    public function printPostJsonFile($actionUrl, $filePath, $parameters = [])
     {
         $this->printResponse($this->postJsonFromFile($actionUrl, $filePath, $parameters));
+    }
+
+    public function printPostJson($actionUrl, $data, $parameters = [])
+    {
+        $this->printResponse($this->postJson($actionUrl, $data, $parameters));
     }
 
     private function printResponse($response)

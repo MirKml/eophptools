@@ -121,7 +121,7 @@ class EoisWsCli
         if ($this->method == self::GET_METHOD) {
             $api->printGetJson($this->actionUrl, $this->queryOptions ?: []);
         } elseif ($this->method == self::POST_METHOD) {
-            $api->printPostJson($this->actionUrl, $options["json-file"],$this->queryOptions ?: []);
+            $api->printPostJsonFile($this->actionUrl, $options["json-file"],$this->queryOptions ?: []);
         }
     }
 
