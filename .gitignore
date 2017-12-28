@@ -1,0 +1,9 @@
+eois-config.*
+log/*
+temp/*
+vendor
+!.gitignore
+!.htaccess
+webapp/config/config.local.neon
+composer.lock
+.idea
