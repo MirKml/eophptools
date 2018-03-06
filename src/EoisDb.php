@@ -46,9 +46,20 @@ class EoisDb
         return $connection->query("select id, Name, IsActive from Products");
     }
 
+    /**
+     * @return Dibi\Result
+     */
     public function getPartnerProducts() {
         $connection = $this->getConnection();
         return $connection->query("select * from PartnerProducts");
+    }
+
+    /**
+     * @return Dibi\Result
+     */
+    public function getResultByQueryString($query) {
+        $connection = $this->getConnection();
+        return $connection->query($query);
     }
 
     public static function printResutlAsCSV(Dibi\Result $result) {

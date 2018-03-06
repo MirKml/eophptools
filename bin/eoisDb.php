@@ -11,4 +11,9 @@ if (file_exists(__DIR__ . "/eois-config.php")) {
 }
 $cli = new MirKml\EO\EoisDbCli($config);
 $cli->execute();
-exit($cli->hasErrors() ? 0 : 1);
+if (!$cli->hasErrors()) {
+    exit(0);
+}
+
+echo implode("\n", $cli->getErrors());
+exit(1);

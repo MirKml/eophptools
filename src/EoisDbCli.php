@@ -7,10 +7,11 @@ class EoisDbCli
     const QUERY_PRODUCTS = "products";
     const QUERY_PARTNERPRODUCTS = "partnerProducts";
 
-    private $shortOptions = "he:d:";
+    private $shortOptions = "he:d:i";
 
     private $environment;
     private $isThroughVpn = false;
+    private $queryFromStdIn = false;
 
     /**
      * shortcut for defined query
@@ -61,6 +62,19 @@ class EoisDbCli
             $this->environment = $environmentOptions["environment"];
             $this->isThroughVpn = $environmentOptions["isThroughVpn"];
         }
+
+        if (isset($options["i"])) {
+            if ($this->definedQuery) {
+                $this->errors[] = "isn't possible use defined query and read query from STDIN";
+                return;
+            }
+            $this->queryFromStdIn = true;
+        }
+
+        if (!$this->queryFromStdIn && !$this->definedQuery) {
+            $this->errors[] = "No query options defined. Use pre defined query"
+                . " or query from STDIN";
+        }
     }
 
     final public static function getEnvironmentOption($environment)
@@ -100,10 +114,8 @@ class EoisDbCli
             $this->printHelp();
             return;
         }
-
         if ($this->errors) {
-           echo implode("\n", $this->errors);
-           return;
+            return;
         }
 
         $this->config->setDdByEnvironment($this->environment, $this->isThroughVpn);
@@ -118,8 +130,17 @@ class EoisDbCli
                     $result = $db->getPartnerProducts();
                     break;
                 default:
+                    $this->errors[] = "unknown defined query for identifier '{$this->definedQuery}'";
+                    return;
                     break;
             }
+        }
+        if ($this->queryFromStdIn) {
+            $query = "";
+            while(!feof(STDIN)) {
+                $query .= fgets(STDIN);
+            }
+            $result = $db->getResultByQueryString($query);
         }
 
         if (isset($result)) {
@@ -135,6 +156,14 @@ class EoisDbCli
         return (bool)($this->errors);
     }
 
+    /**
+     * @return string[]
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
     protected function printHelp()
     {
         global $argv;
@@ -143,6 +172,7 @@ class EoisDbCli
         echo "-e: environment for EOIS database instance: one of these: 'devel', 'staging'"
             . ", 'staging-vpn', 'production', 'production-vpn'. Default is 'devel'.\n";
         echo "-d: predefined query, one of these: " . implode(", ", self::$definedQueries) . "\n";
+        echo "-i: read query from STDIN\n";
     }
 }
 
